@@ -3,7 +3,7 @@
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Support\Str;
 
 /**
@@ -106,7 +106,7 @@ trait SearchableTrait
         if (array_key_exists('columns', $this->searchable)) {
             return $this->searchable['columns'];
         } else {
-            return DB::connection()->getSchemaBuilder()->getColumnListing($this->table);
+            return Capsule::connection()->getSchemaBuilder()->getColumnListing($this->table);
         }
     }
 
@@ -291,7 +291,7 @@ trait SearchableTrait
      * @param \Illuminate\Database\Eloquent\Builder $original
      */
     protected function mergeQueries(Builder $clone, Builder $original) {
-        $original->from(DB::connection($this->connection)->raw("({$clone->toSql()}) as `{$this->getTable()}`"));
+        $original->from(Capsule::connection($this->connection)->raw("({$clone->toSql()}) as `{$this->getTable()}`"));
         $original->mergeBindings($clone->getQuery());
     }
 }
